@@ -101,3 +101,13 @@ In case that we want persistent data from our database container, we shouldn't u
 ```bash
 docker volume prune
 ```
+
+#### Observation for a production enviroment
+
+Because within a production environment, the only constant change you are going to have is the "Node/Express" container. We must make sure that this container is the only one affected when rebuilding and re-raising the containers.
+
+To do this we'll modify the docker-compose command as follows:
+
+```bash
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build --no-deps node-app
+```
