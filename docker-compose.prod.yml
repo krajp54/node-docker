@@ -11,4 +11,14 @@ services:
         NODE_ENV: production
     environment: 
       - NODE_ENV=production
+      # Tomamos los valores correspondientes a las variables del contenedor desde las variables
+      # de entorno de la propia maquina de produccion, en este caso una maquina virtual en Azure
+      - MONGO_USER=${MONGO_USER}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - SESSION_SECRET=${SESSION_SECRET}
     command: node index.js
+
+  mongo:
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
