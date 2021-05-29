@@ -5,6 +5,15 @@ services:
       - "80:80"
 
   node-app:
+    # Configuraciones adicionales para el funcionamiento de Docker Swarm en el ambiente de
+    # produccion
+    deploy:
+      replicas: 8
+      restart_policy:
+        condition: any
+      update_config:
+        parallelism: 2
+        delay: 15s
     build: 
       context: .
       args: 

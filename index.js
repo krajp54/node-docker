@@ -77,7 +77,7 @@ app.use(
 app.use(express.json());
 
 app.get("/api/v1", (req, res) => {
-    res.send("<h1>Hello JP from a production enviroment</h1>");
+    res.send("<h1>Hello JP from a production enviroment automation</h1>");
     console.log("hi there");
 });
 

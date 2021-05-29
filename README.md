@@ -58,7 +58,7 @@ The command has several flags that we will specify below.
 
   - In this case, Nodemon is responsible for listening the changes within the application source code and restarting the NodeJS process to reflect those changes.
 
-### Docker compose
+## Docker compose
 
 To automate the process of building the image and running the container, we can make use of a [docker-compose](docker-compose.backup.yml) file.
 
@@ -94,7 +94,7 @@ To stop the execution of the image. The flags that we're using are:
 
   - To delete the volumes (named and anonymous) used for the application containers
 
-#### Observation for the MongoDB container
+### Observation for the MongoDB container
 
 In case that we want persistent data from our database container, we shouldn't use the "-v" flag, instead we have to use the following command, after run the containers, to delete anonymous volumes that are no longer used:
 
@@ -102,7 +102,7 @@ In case that we want persistent data from our database container, we shouldn't u
 docker volume prune
 ```
 
-#### Observation for a production enviroment
+### Observation for a production enviroment
 
 Because within a production environment, the only constant change you are going to have is the "Node/Express" container. We must make sure that this container is the only one affected when rebuilding and re-raising the containers.
 
@@ -115,3 +115,76 @@ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --force-re
 ```
 
 **It should be noted that it isn't considered a good practice to build the docker image within the production environment.**
+
+## Better workflow with Docker Hub
+
+As part of a better workflow when taking our Docker application to production, it's recommended to make use of an image repository as in this case Docker Hub.
+
+To do so, we can follow the steps below (If you already have a Docker Hub account):
+
+1. Create a repository inside Docker Hub.
+2. In our development enviroment login to Docker Hub through the following command:
+
+```bash
+docker login
+```
+
+3. Next, we need to rename our app image to match the name of the repository in Docker Hub:
+
+```bash
+docker image tag node-docker_node-app <username>/<repo-name>
+```
+
+- Replace the "node-docker_node-app" for the name of your image
+
+4. After that, we build the image that we'll use in the production enviroment.
+
+```bash
+# For all the services
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml build
+
+# For the main app service
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml build node-app
+```
+
+5. Upload (Push) the recently builded image to Docker Hub.
+
+```bash
+# For all the services
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml push
+
+# For the main app service
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml push node-app
+```
+
+6. Inside the production enviroment we download (pull) the recent changes in the Docker Hub repo.
+
+```bash
+# For all the services
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml pull
+
+# For the main app service
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml pull node-app
+```
+
+7. In the production enviroment, we run our app again with the changes made.
+
+```bash
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --no-deps node-app
+```
+
+### Automation with Watchtower
+
+Within our production environment we can automate the process of downloading and executing the changes made within the Docker Hub repository image.
+
+To do this, we will make use of a special container called "Watchtower" that will be responsible for listening for changes in the Docker Hub repository and automatically download the changes to raise again the image of our application.
+
+```bash
+docker run -d --name watchtower -e WATCHTOWER_TRACE=true -e WATCHTOWER_DEBUG=true -e WATCHTOWER_POLL_INTERVAL=<miliseconds> -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower <services to watch>
+```
+
+## Orchestrator with Docker Swarm
+
+```bash
+docker swarm init --advertise-addr <ip addr to listen>
+```
