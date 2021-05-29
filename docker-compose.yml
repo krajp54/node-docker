@@ -19,6 +19,7 @@ services:
     # exponer el puerto de la aplicacion
     # ports:
       # - "3000:3000"
+    image: krajp54/node-docker-app
     environment: 
       - PORT=3000
     # Para asegurarnos que el contenedor de la base de datos en Mongo sea

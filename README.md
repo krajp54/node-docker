@@ -110,4 +110,8 @@ To do this we'll modify the docker-compose command as follows:
 
 ```bash
 docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build --no-deps node-app
+  or
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --force-recreate --no-deps node-app
 ```
+
+**It should be noted that it isn't considered a good practice to build the docker image within the production environment.**
