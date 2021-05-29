@@ -1,0 +1,28 @@
+# Indicamos la version que usaremos de Docker
+version: "3"
+
+# Especificamos los contenedores que vamos a ejecutar a traves de este archivo
+services:
+  node-app:
+    # Despues de especificar el contenedor, especificamos las diferentes configuraciones
+    # que estaran definidas para dicho contenedor.
+    #
+    # En este caso "build", es la opcion para indicar el Dockerfile encargado de la
+    # construccion de la imagen
+    build: .
+    # C
+    # La opcion "ports" nos permite especificar los puertos del contenedor que van a ser
+    # expuestos hacia Docker.
+    ports:
+      - "3000:3000"
+    # La opcion "volumes" nos permite especificar los diferentes volumenes que vamos a
+    # enlazar dentro de nuestro contenedor.
+    volumes:
+      - ./:/app:ro
+      - /app/node_modules
+    # La opcion "environment" y "env_file" nos permite configurar las variables de entorno
+    # y el archivo con las variables respectivamente.
+    environment:
+      - PORT=3000
+    # env_file:
+    # - ./.env

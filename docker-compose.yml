@@ -1,0 +1,50 @@
+# Este archivo contendra las configuraciones comunes entre el 
+# ambiente de produccion y el ambiente de desarrollo
+version: "3"
+# Cada uno de los servicios representa a un tipo de contenedor
+# especifico
+services: 
+# Vamos a hacer uso de NginX para crear un balanceo de carga que nos permita
+# escalar la cantidad de contenedores activos para la aplicacion de Express
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - "3000:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+
+  node-app:
+    build: .
+    # Dado que ahora el encargado del balanceo va a ser NginX ya no es necesario
+    # exponer el puerto de la aplicacion
+    # ports:
+      # - "3000:3000"
+    environment: 
+      - PORT=3000
+    # Para asegurarnos que el contenedor de la base de datos en Mongo sea
+    # el primero en ejecutarse podemos configurarlo como una dependencia
+    # de la aplicacion de Node.
+    # Esto no asegura que el gestor de base de datos interno este totalmente
+    # funcional antes de que el contenedor de Node sea ejecutado.
+    depends_on:
+      - mongo
+
+  mongo:
+    # La propiedad "image" nos permite usar una imagen ya establecida
+    # de la aplicacion
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=jp
+      - MONGO_INITDB_ROOT_PASSWORD=root
+    # Para tener persistencia de los datos posteriormente a que el contenedor
+    # sea detenido, haremos uso de un volumen etiquetado
+    # Estos volumenes etiquetados pueden ser usados por varios 
+    # servicios (contenedores) de las aplicaciones
+    volumes:
+      - mongo-db:/data/db
+
+  redis:
+    image: redis
+
+volumes:
+  mongo-db:
