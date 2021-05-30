@@ -185,6 +185,22 @@ docker run -d --name watchtower -e WATCHTOWER_TRACE=true -e WATCHTOWER_DEBUG=tru
 
 ## Orchestrator with Docker Swarm
 
+Due to, during the process of updating the containers of our app we lose availability of the service we'll make use of a Docker's own orchestrator known as Swarm.
+
+This service only need to be active on the production enviroment, to initialize we're going to use the following command:
+
 ```bash
 docker swarm init --advertise-addr <ip addr to listen>
+```
+
+Once the service has been initilized, and the corresponding changes have been made in the docker-compose files, we'll use the following command to raise the services through the orchestrator.
+
+```bash
+docker stack deploy -c docker-compose.yml -c docker-compose.prod.yml docker-node-app
+```
+
+To verify that all the services have been initialized:
+
+```bash
+docker stack ps docker-node-app
 ```
